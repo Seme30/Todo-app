@@ -16,9 +16,10 @@ class MyApp extends StatelessWidget {
           colorScheme: ColorScheme.fromSwatch().copyWith(
             primary: const Color.fromRGBO(1, 49, 88, 1),
             secondary: Colors.white,
+            tertiary: const Color.fromRGBO(2, 111, 177, 1),
           ),
           appBarTheme: const AppBarTheme(
-            color: Color.fromRGBO(2, 111, 177, 1),
+            backgroundColor: Color.fromRGBO(2, 111, 177, 1),
           ),
         ),
         home: MainScreen());
