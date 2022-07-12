@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import '../widgets/task_list.dart';
-import '../localdata.dart';
+import '../widgets/todo_list.dart';
+
 
 class MainScreen extends StatelessWidget {
-  final localData = getLocalData;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -39,13 +39,9 @@ class MainScreen extends StatelessWidget {
           padding: EdgeInsets.all(20),
           child: ListView.builder(
             itemBuilder: (ctx, index) {
-              return TaskList(
-                localData[index].taskName,
-                localData[index].date,
-                (index + 1),
-              );
+              return Text('No Data');
             },
-            itemCount: localData.length,
+            itemCount: 1,
           ),
         ),
       ]),
