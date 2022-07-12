@@ -23,9 +23,9 @@ class TodoController extends GetxController {
       print("Got Todos");
       _todoList = [];
       final List<Map<String,dynamic>> todolist = response.body; 
-      todolist.forEach((element) { 
+      for (var element in todolist) { 
         _todoList.add(TodoModel.fromJson(element));
-      });
+      }
        _isLoaded = true;
       update();
     }
