@@ -1,26 +1,22 @@
-enum repeat {
-  onceinmonth,
-  twiceinmonth,
-  threetimes,
-}
 
-enum tasktype {
-  personal,
-  organizational,
-}
+enum Status{
+    completed,
+    notCompleted
+  }
 
-class Task {
+
+class Todo {
   final String id;
   final String taskName;
-  final DateTime date;
-  final repeat taskRepeat;
-  final tasktype taskType;
+  final DateTime deadline;
+  final DateTime createdDate;
+  final Status status;
 
-  const Task({
+  const Todo({
     required this.id,
     required this.taskName,
-    required this.date,
-    required this.taskRepeat,
-    required this.taskType,
+    required this.deadline,
+    required this.createdDate,
+    required this.status
   });
 }
