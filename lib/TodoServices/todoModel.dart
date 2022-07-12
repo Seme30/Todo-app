@@ -26,4 +26,8 @@ class TodoModel {
     todoDeadline = json['todoDeadline'];
     status = json['status'];
   }
+
 }
+
+
+
