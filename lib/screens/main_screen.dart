@@ -1,75 +1,144 @@
 import 'package:flutter/material.dart';
-import '../widgets/todo_list.dart';
+import 'package:provider/provider.dart';
+import 'package:todoapp/TodoServices/todoModel.dart';
+import 'package:todoapp/constants/dimensions.dart';
+import 'package:todoapp/todo_provider.dart';
+import 'package:todoapp/widgets/big_text.dart';
+import 'package:todoapp/widgets/small_text.dart';
+import 'package:todoapp/widgets/todo_list.dart';
 
 
-class MainScreen extends StatelessWidget {
+class MainScreen extends StatefulWidget {
+  const MainScreen({Key? key}) : super(key: key);
 
+
+
+  @override
+  State<MainScreen> createState() => _MainScreenState();
+}
+
+class _MainScreenState extends State<MainScreen> {
+
+  late Future<List<TodoModel>> _getData;
+
+  Future<List<TodoModel>> getTodoList() async {
+    List<TodoModel> todoList = await TodoProvider.getData();
+    return todoList;
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _getData = getTodoList();
+  }
+
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'All Lists',
-          style: TextStyle(
-            fontFamily: 'Raleway',
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        leading: IconButton(
-          onPressed: () {},
-          icon: const Icon(Icons.menu),
-        ),
-        actions: [
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.search),
-          ),
-          IconButton(
-            icon: const Icon(Icons.check_circle),
-            onPressed: () {},
-          ),
-        ],
-        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
+        title: BigText(text: "Tasks", color: Colors.blueAccent,),
       ),
-      body: Column(children: [
-        Container(
-          height: (MediaQuery.of(context).size.height * 0.91),
-          decoration:
-              BoxDecoration(color: Theme.of(context).colorScheme.primary),
-          padding: EdgeInsets.all(20),
-          child: ListView.builder(
-            itemBuilder: (ctx, index) {
-              return Text('No Data');
-            },
-            itemCount: 1,
-          ),
-        ),
-      ]),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {},
-        child: const Icon(
-          Icons.add,
-          color: Colors.black,
-        ),
+      body: FutureBuilder<List<TodoModel>>(
+        future: _getData,
+        builder: (context,snaphot){
+          switch(snaphot.connectionState){
+            case ConnectionState.waiting:{
+              return CircularProgressIndicator();
+            }
+            case ConnectionState.active: {
+              return CircularProgressIndicator();
+            }
+            case ConnectionState.done: {
+              if(snaphot.hasData){
+                  return  Container(
+                        padding: EdgeInsets.only(left: Dimensions.width20, right: Dimensions.width20),
+                        height: double.maxFinite,
+                        width: double.maxFinite,
+                        decoration: BoxDecoration(color: Colors.white),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                              SingleChildScrollView(
+                                child: ListView.builder(itemBuilder: (context,index){
+                                  return TodoList(
+                                    title: snaphot.data![index].todoTitle!, 
+                                    date: snaphot.data![index].todoDeadline!, 
+                                    status: snaphot.data![index].status!);
+                                }),
+                              ),
+                              Container(
+                                padding: EdgeInsets.symmetric(horizontal: Dimensions.width20, vertical: Dimensions.width20),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(Dimensions.radius15),
+                                  color: Colors.black26
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    SmallText(text: "Add a Task", color: Colors.blueAccent,),
+                                    Icon(Icons.add, color: Colors.blueAccent)
+                                  ],
+                                ),
+                              ),
+
+                          ],  
+                          
+                        ),
+                      );
+              }else{
+                return Text('No Data');
+              }
+              
+            }
+            default: return Text(snaphot.error.toString());
+          }
+  
+        },
       ),
-      // bottomNavigationBar: BottomNavigationBar(
-      //     backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
-      //     items: [
-      //       BottomNavigationBarItem(
-      //         icon: IconButton(
-      //           onPressed: () {},
-      //           icon: Icon(Icons.mic),
-      //         ),
-      //       ),
-      //       BottomNavigationBarItem(
-      //         icon: TextField(
-      //           decoration: InputDecoration(
-      //             label: Text('Enter a Quick Task here'),
-      //           ),
-      //         ),
-      //       )
-      //     ]),
+       bottomNavigationBar: BottomNavigationBar(
+            type: BottomNavigationBarType.fixed,
+            selectedItemColor: Colors.black26,
+            unselectedItemColor: Colors.black87,
+            currentIndex: 0,
+            items: const [
+              BottomNavigationBarItem(icon: Icon(Icons.list), 
+              backgroundColor: Colors.black87,
+              label: 'All'
+              ),
+              BottomNavigationBarItem(icon: Icon(Icons.circle), label: 'Completed'),
+              BottomNavigationBarItem(icon: Icon(Icons.circle_outlined,), label: 'InComplete')
+             ])
+                  
     );
+    
   }
 }
+// Container(
+//         padding: EdgeInsets.symmetric(horizontal: Dimensions.width20, vertical: Dimensions.width20),
+//         child: Row(
+//           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//           children: [
+//             Column(
+//               children: [
+//                 Icon(Icons.list),
+//                 SmallText(text: 'All',),
+//               ],
+//             ),
+//             Column(
+//               children: [
+//                 Icon(Icons.circle),
+//                 SmallText(text: 'Complted',),
+//               ],
+//             ),
+//             Column(
+//               children: [
+//                 Icon(Icons.circle_outlined),
+//                 SmallText(text: 'Incomplete',),
+//               ],
+//             )
+//           ],
+//         ),
+//       ),

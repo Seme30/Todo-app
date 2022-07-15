@@ -1,15 +1,12 @@
 
-enum Status{
-    completed,
-    notCompleted
-  }
+
 
 class TodoModel {
   int? id;
   String? todoTitle;
-  DateTime? todoDeadline;
-  DateTime? todoCreatedDate;
-  Status? status;
+  String? todoDeadline;
+  String? todoCreatedDate;
+  String? status;
 
    TodoModel({
     required this.id,
