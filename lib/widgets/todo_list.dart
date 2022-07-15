@@ -1,35 +1,33 @@
 import 'package:flutter/material.dart';
+import 'package:todoapp/constants/dimensions.dart';
+import 'package:todoapp/widgets/small_text.dart';
 
 
-class TaskList extends StatelessWidget {
+class TodoList extends StatelessWidget {
+
   final String title;
-  final DateTime date;
-  final int number;
+  final String date;
+  final String status;
 
-  const TaskList(this.title, this.date, this.number);
+   const TodoList({required this.title, required this.date, required this.status});
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Card(
-          borderOnForeground: true,
-          color: Theme.of(context).appBarTheme.backgroundColor,
-          elevation: 5,
-          child: ListTile(
-            leading: CircleAvatar(
-              child: Text('$number'),
+        Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(Dimensions.radius15),
+              color: Colors.black26,
             ),
-            title: Text(title),
-            subtitle: Text('$date'),
-            trailing: IconButton(
-              onPressed: () {},
-              icon: const Icon(
-                Icons.delete,
-                color: Colors.red,
-              ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                status=='Completed'?Icon(Icons.check_circle_outline_rounded): Icon(Icons.circle_outlined),
+                SmallText(text: title),
+                SmallText(text: date.substring(0,11))
+              ],
             ),
           ),
-        ),
         SizedBox(
           height: 10,
         )
