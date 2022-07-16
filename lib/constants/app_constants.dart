@@ -4,6 +4,6 @@ class AppConstants {
   static const int APP_VERSION = 1;
   
   static const String BASE_URL = "https://todo-rest-api-seme30.herokuapp.com";
-  static const String TODO ='https://todo-rest-api-seme30.herokuapp.com/api/v1/todoitems';
+  static const String TODO ='/api/v1/todoitems';
 
 }
