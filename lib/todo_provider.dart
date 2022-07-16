@@ -53,38 +53,28 @@ class TodoProvider with ChangeNotifier {
     return responseData;
   }
 
-  static Future<List<TodoModel>> getData() async {
-
-    print("get Data");
-
-    List<TodoModel>? todo = [];
-
-    print("todo");
-
-    final uri = Uri.parse(AppConstants.TODO);
-    print("uri: "+uri.toString());
-
-    http.Response response = await http.get(uri,
-    headers: {'Content-type':'application/json'});
-
-    print("status code: "+response.statusCode.toString());    
+   Future<List<TodoModel>> getData() async {
+    print('called');
     
+    List<TodoModel>? todo = [];
+    http.Response response = await http.get( Uri.parse(AppConstants.TODO),
+    headers: {'Content-type':'application/json'});
+    print(response.body);
     if (response.statusCode == 200) {
-      print('hello');
       final todoList = json.decode(response.body);
-
       for(var element in todoList){
         todo.add(TodoModel.fromJson(element));
       }
-
-      print(todo[0].todoTitle);
+    
       // notifyListeners();
 
     } else {
       // notifyListeners();
-      print(response.body);
       const GetSnackBar(title: "Todo", message: "Failed to retrieve data", backgroundColor: Colors.redAccent,);
     }
+    _todoModelList = [];
+    _todoModelList = todo;
+    print(_todoModelList[0].todoTitle);
     return todo;
   }
 

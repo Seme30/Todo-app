@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:todoapp/TodoServices/todoModel.dart';
+import 'package:todoapp/constants/colors.dart';
 import 'package:todoapp/constants/dimensions.dart';
 import 'package:todoapp/todo_provider.dart';
 import 'package:todoapp/widgets/big_text.dart';
@@ -9,9 +10,6 @@ import 'package:todoapp/widgets/todo_list.dart';
 
 
 class MainScreen extends StatefulWidget {
-  const MainScreen({Key? key}) : super(key: key);
-
-
 
   @override
   State<MainScreen> createState() => _MainScreenState();
@@ -20,9 +18,10 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
 
   late Future<List<TodoModel>> _getData;
+  TodoProvider todoProvider = TodoProvider();
 
   Future<List<TodoModel>> getTodoList() async {
-    List<TodoModel> todoList = await TodoProvider.getData();
+    final todoList = await todoProvider.getData();
     return todoList;
   }
 
@@ -36,10 +35,8 @@ class _MainScreenState extends State<MainScreen> {
   
   @override
   Widget build(BuildContext context) {
+    
     return Scaffold(
-      appBar: AppBar(
-        title: BigText(text: "Tasks", color: Colors.blueAccent,),
-      ),
       body: FutureBuilder<List<TodoModel>>(
         future: _getData,
         builder: (context,snaphot){
@@ -52,38 +49,50 @@ class _MainScreenState extends State<MainScreen> {
             }
             case ConnectionState.done: {
               if(snaphot.hasData){
+                final todos = todoProvider.todoModeList;
                   return  Container(
-                        padding: EdgeInsets.only(left: Dimensions.width20, right: Dimensions.width20),
-                        height: double.maxFinite,
+                        padding: EdgeInsets.only(left: Dimensions.width20, right: Dimensions.width20, top: Dimensions.height45),
+                        height: MediaQuery.of(context).size.height,
                         width: double.maxFinite,
-                        decoration: BoxDecoration(color: Colors.white),
+                        decoration: BoxDecoration(color: AppColors.mainColor),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                              SingleChildScrollView(
-                                child: ListView.builder(itemBuilder: (context,index){
-                                  return TodoList(
-                                    title: snaphot.data![index].todoTitle!, 
-                                    date: snaphot.data![index].todoDeadline!, 
-                                    status: snaphot.data![index].status!);
-                                }),
+                              BigText(text: "Tasks", color: Colors.blueAccent,),
+                              SizedBox(height:Dimensions.height30),
+                              Expanded(
+                                child: SingleChildScrollView(
+                                    child: Container(
+                                      height: 450,
+                                      child: ListView.builder(
+                                        itemCount: todos.length,
+                                        itemBuilder: (context,index){
+                                      return TodoList(
+                                        title: todos[index].todoTitle!, 
+                                        date: todos[index].todoDeadline!, 
+                                        status: todos[index].status!);
+                                  }),
+                                    ),
+                                  
+                                ),
                               ),
                               Container(
                                 padding: EdgeInsets.symmetric(horizontal: Dimensions.width20, vertical: Dimensions.width20),
+                                margin: EdgeInsets.only(bottom: Dimensions.height30),
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(Dimensions.radius15),
-                                  color: Colors.black26
+                                  color: AppColors.secColor
                                 ),
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
-                                    SmallText(text: "Add a Task", color: Colors.blueAccent,),
-                                    Icon(Icons.add, color: Colors.blueAccent)
+                                    SmallText(text: "Add a Task", color: AppColors.textColor),
+                                    Icon(Icons.add, color: AppColors.textColor)
                                   ],
                                 ),
                               ),
-
+                        
                           ],  
                           
                         ),
@@ -99,23 +108,33 @@ class _MainScreenState extends State<MainScreen> {
         },
       ),
        bottomNavigationBar: BottomNavigationBar(
+        
+          backgroundColor: AppColors.mainColor,
+            // fixedColor: AppColors.textColor2,
             type: BottomNavigationBarType.fixed,
-            selectedItemColor: Colors.black26,
-            unselectedItemColor: Colors.black87,
+            selectedItemColor: AppColors.textColor,
+            unselectedItemColor: AppColors.textColor2,
             currentIndex: 0,
             items: const [
-              BottomNavigationBarItem(icon: Icon(Icons.list), 
-              backgroundColor: Colors.black87,
+              BottomNavigationBarItem(icon: Icon(Icons.list,color: AppColors.iconColor1,), 
               label: 'All'
+              
               ),
-              BottomNavigationBarItem(icon: Icon(Icons.circle), label: 'Completed'),
-              BottomNavigationBarItem(icon: Icon(Icons.circle_outlined,), label: 'InComplete')
+              BottomNavigationBarItem(icon: Icon(Icons.circle, color: AppColors.iconColor1), label: 'Completed'),
+              BottomNavigationBarItem(icon: Icon(Icons.circle_outlined,color: AppColors.iconColor1), label: 'InComplete')
              ])
                   
     );
     
   }
 }
+
+
+// ListView(
+//                                     children: snaphot.data!.map((e){
+//                                     return TodoList(title: e.todoTitle!, date: e.todoDeadline!, status: e.status!);
+//                                   }).toList(),
+//                                   )
 // Container(
 //         padding: EdgeInsets.symmetric(horizontal: Dimensions.width20, vertical: Dimensions.width20),
 //         child: Row(

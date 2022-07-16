@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:todoapp/constants/colors.dart';
 import 'package:todoapp/constants/dimensions.dart';
 import 'package:todoapp/widgets/small_text.dart';
 
@@ -15,22 +16,25 @@ class TodoList extends StatelessWidget {
     return Column(
       children: [
         Container(
+            height: 60,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(Dimensions.radius15),
-              color: Colors.black26,
+              color: AppColors.secColor,
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                status=='Completed'?Icon(Icons.check_circle_outline_rounded): Icon(Icons.circle_outlined),
-                SmallText(text: title),
-                SmallText(text: date.substring(0,11))
+                status=='completed'?
+                Icon(Icons.check_circle_outline_rounded, color: AppColors.iconColor1)
+                : Icon(Icons.circle_outlined,color: AppColors.iconColor1),
+                SmallText(text: title, color: AppColors.textColor,),
+                SmallText(text: date.substring(0,10), color: AppColors.textColor,)
               ],
             ),
           ),
-        SizedBox(
-          height: 10,
-        )
+          SizedBox(
+            height: Dimensions.height10,
+          )
       ],
     );
   }
