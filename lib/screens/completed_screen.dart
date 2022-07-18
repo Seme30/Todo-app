@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:todoapp/TodoServices/todoController.dart';
 import 'package:todoapp/constants/colors.dart';
 import 'package:todoapp/constants/dimensions.dart';
+import 'package:todoapp/route_helper.dart';
 import 'package:todoapp/widgets/big_text.dart';
 import 'package:todoapp/widgets/small_text.dart';
 import 'package:todoapp/widgets/todo_list.dart';
@@ -27,6 +28,26 @@ class _CompletedScreenState extends State<CompletedScreen> {
   Widget build(BuildContext context) {
 
     return Scaffold(
+      appBar: AppBar(
+        title: BigText(text: 'Tasks', color: Colors.blueAccent,),
+        elevation: 0,
+        centerTitle: true,
+        actions: [
+          IconButton(
+          onPressed: (){
+            Get.toNamed(RouteHelper.signinScreen);
+          }, 
+          icon: Container(
+              padding: EdgeInsets.all(Dimensions.height10),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.iconColor1
+              ),
+              child: Icon(Icons.logout_outlined)),
+              iconSize: Dimensions.iconSize16
+          ),
+        ],
+      ),
       body: Container(
       padding: EdgeInsets.only(left: Dimensions.width20, right: Dimensions.width20, top: Dimensions.height45),
         height: MediaQuery.of(context).size.height,
