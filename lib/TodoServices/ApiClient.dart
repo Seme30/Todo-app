@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:convert';
 
 import 'package:get/get.dart';
+import 'package:todoapp/TodoServices/todoModel.dart';
 
 class ApiClient extends GetConnect implements GetxService {
   
@@ -17,15 +18,19 @@ class ApiClient extends GetConnect implements GetxService {
   }
       
   Future<Response> getTodos(String uri) async{
-    print('called api client');
     try{
-      print('url');
       Response response = await get(uri);
-      print(response.statusCode);
-      print('got response in api client');
       return response;
     }catch(e){
-      print(e.toString());
+      return Response(statusCode: 1, statusText: e.toString());
+    }
+  }
+
+  Future<Response> createTodo(String url, dynamic json) async {
+    try{
+      Response response = await post(url,json);
+      return response;
+    }catch(e){
       return Response(statusCode: 1, statusText: e.toString());
     }
   }

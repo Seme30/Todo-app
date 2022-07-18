@@ -11,8 +11,11 @@ class TodoRepo extends GetxService{
   });
 
   Future<Response> getTodoList() async {
-    print('todo repo');
     return await apiClient.getTodos(AppConstants.TODO);
+  }
+
+  Future<Response> createTodo(dynamic json) async {
+    return await apiClient.createTodo(AppConstants.TODO, json);
   }
 
 
