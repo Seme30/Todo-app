@@ -1,14 +1,13 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:otp_text_field/otp_field.dart';
 import 'package:otp_text_field/otp_text_field.dart';
 import 'package:otp_text_field/style.dart';
 import 'package:todoapp/TodoServices/AuthService.dart';
 import 'package:todoapp/constants/colors.dart';
 import 'package:todoapp/constants/dimensions.dart';
-import 'package:todoapp/route_helper.dart';
+import 'package:todoapp/screens/sign_in_screen.dart';
 import 'package:todoapp/widgets/big_text.dart';
 // import 'package:todo_app/services/AuthService.dart';
 
@@ -52,7 +51,10 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
       appBar: AppBar(
         leading: IconButton(
             onPressed: () {
-              Get.toNamed(RouteHelper.signinScreen);
+              Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (builder) => SigninScreen()),
+                  (route) => false);
             },
             icon: Container(
                 padding: EdgeInsets.all(Dimensions.height10),

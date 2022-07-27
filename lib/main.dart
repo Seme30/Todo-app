@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:todoapp/TodoServices/AuthService.dart';
-import 'package:todoapp/TodoServices/todoController.dart';
-import 'package:todoapp/TodoServices/dependencies.dart' as dep;
 import 'package:todoapp/screens/sign_in_screen.dart';
 import 'package:todoapp/screens/tabs_screen.dart';
 import './screens/main_screen.dart';
@@ -11,7 +9,6 @@ import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await dep.init();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -31,9 +28,9 @@ class _MyAppState extends State<MyApp> {
   AuthService authService = AuthService();
 
   void checkLogin() async {
-    String? tokne = await authService.getToken();
-    print("tokne");
-    if (tokne != null)
+    String? token = await authService.getToken();
+    print("token");
+    if (token != null)
       setState(() {
         currentWidget = LandingPage();
       });
@@ -47,9 +44,7 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    Get.find<TodoController>().getTodoList();
-
-    return GetMaterialApp(
+    return MaterialApp(
         title: 'Flutter Demo',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(

@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:todoapp/TodoServices/todoController.dart';
+import 'package:todoapp/TodoServices/todoDatabase.dart';
+import 'package:todoapp/TodoServices/todoModel.dart';
 import 'package:todoapp/constants/colors.dart';
 import 'package:todoapp/constants/dimensions.dart';
-import 'package:todoapp/route_helper.dart';
+import 'package:todoapp/screens/sign_in_screen.dart';
 import 'package:todoapp/widgets/big_text.dart';
 import 'package:todoapp/widgets/small_text.dart';
 import 'package:todoapp/widgets/todo_list.dart';
@@ -14,10 +15,22 @@ class AllScreen extends StatefulWidget {
 }
 
 class _AllScreenState extends State<AllScreen> {
+  late List<TodoModel> todos;
+  bool isLoading = false;
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    refreshTodos();
+  }
+
+  Future refreshTodos() async {
+    setState(() => isLoading = true);
+
+    todos = await TodoDatabase.instance.readAllTodos();
+
+    setState(() => isLoading = false);
   }
 
   @override
@@ -33,7 +46,10 @@ class _AllScreenState extends State<AllScreen> {
         actions: [
           IconButton(
               onPressed: () {
-                Get.toNamed(RouteHelper.signinScreen);
+                Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (builder) => SigninScreen()),
+                    (route) => false);
               },
               icon: Container(
                   padding: EdgeInsets.all(Dimensions.height10),
@@ -56,43 +72,25 @@ class _AllScreenState extends State<AllScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             SizedBox(height: Dimensions.height30),
-            GetBuilder<TodoController>(builder: (todoController) {
-              return todoController.isLoaded
-                  ? Expanded(
-                      child: SingleChildScrollView(
-                        child: Container(
-                          height: Dimensions.height45 * 10,
-                          child: ListView.builder(
-                              itemCount: todoController.todoList.length,
-                              itemBuilder: (context, index) {
-                                return todoController.todoList.isEmpty
-                                    ? Center(
-                                        child: Row(
-                                          children: [
-                                            BigText(
-                                              text: 'There is no Task yet',
-                                              color: AppColors.textColor,
-                                            ),
-                                            BigText(
-                                              text: 'Add a new Task',
-                                              color: AppColors.textColor,
-                                            )
-                                          ],
-                                        ),
-                                      )
-                                    : TodoList(
-                                        title: todoController
-                                            .todoList[index].todoTitle!,
-                                        date: todoController
-                                            .todoList[index].todoDeadline!,
-                                        status: todoController
-                                            .todoList[index].status!);
-                              }),
+            isLoading
+                ? Center(child: CircularProgressIndicator())
+                : todos.isEmpty
+                    ? BigText(text: 'No Todos')
+                    : Expanded(
+                        child: SingleChildScrollView(
+                          child: Container(
+                            height: Dimensions.height45 * 10,
+                            child: ListView.builder(
+                                itemCount: todos.length,
+                                itemBuilder: (context, index) {
+                                  return TodoList(
+                                      title: todos[index].todoTitle!,
+                                      date: todos[index].todoDeadline!,
+                                      status: todos[index].status!);
+                                }),
+                          ),
                         ),
                       ),
-                    )
-                  : Center(child: CircularProgressIndicator());
-            }),
             Container(
               padding: EdgeInsets.symmetric(
                   horizontal: Dimensions.width20, vertical: Dimensions.width20),

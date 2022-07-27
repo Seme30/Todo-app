@@ -75,6 +75,7 @@ class AuthService {
             builder: (builder) => LandingPage(),
           ),
           (route) => false);
+
       showSnackBar(context, "Logged In");
     } catch (e) {
       showSnackBar(context, e.toString());

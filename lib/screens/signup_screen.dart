@@ -3,7 +3,6 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:todoapp/constants/colors.dart';
 import 'package:todoapp/constants/dimensions.dart';
-import 'package:todoapp/route_helper.dart';
 import 'package:todoapp/widgets/big_text.dart';
 import 'package:todoapp/widgets/text_field.dart';
 
@@ -136,9 +135,7 @@ class _SignupScreenState extends State<SignupScreen> {
               ),
               SizedBox(height: Dimensions.height10),
               InkWell(
-                  onTap: () {
-                    Get.toNamed(RouteHelper.initial);
-                  },
+                  onTap: () {},
                   child: BigText(
                     text: 'Forgot Password?',
                     color: AppColors.textColor,
