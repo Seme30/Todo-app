@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:get/get.dart';
+import 'package:todoapp/TodoServices/AuthService.dart';
 import 'package:todoapp/constants/colors.dart';
 import 'package:todoapp/constants/dimensions.dart';
+import 'package:todoapp/screens/phoneauth_screen.dart';
+import 'package:todoapp/screens/tabs_screen.dart';
 import 'package:todoapp/widgets/big_text.dart';
 import 'package:todoapp/widgets/text_field.dart';
+import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({Key? key}) : super(key: key);
@@ -16,8 +19,12 @@ class SignupScreen extends StatefulWidget {
 class _SignupScreenState extends State<SignupScreen> {
   @override
   Widget build(BuildContext context) {
+    firebase_auth.FirebaseAuth firebaseAuth =
+        firebase_auth.FirebaseAuth.instance;
     TextEditingController _emailController = TextEditingController();
     TextEditingController _passwordController = TextEditingController();
+    bool circular = false;
+    AuthService authServcie = AuthService();
 
     return Scaffold(
       appBar: AppBar(
@@ -40,7 +47,14 @@ class _SignupScreenState extends State<SignupScreen> {
                 height: Dimensions.height30,
               ),
               InkWell(
-                onTap: () {},
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (builder) => PhoneAuthScreen(),
+                    ),
+                  );
+                },
                 child: Container(
                   height: Dimensions.height20 * 4,
                   padding: EdgeInsets.symmetric(
@@ -88,7 +102,39 @@ class _SignupScreenState extends State<SignupScreen> {
                         height: Dimensions.height54,
                       ),
                       InkWell(
-                        onTap: () {},
+                        onTap: () async {
+                          setState(() {
+                            circular = true;
+                          });
+                          try {
+                            setState(() {
+                              circular = false;
+                            });
+                            firebase_auth.UserCredential userCredential =
+                                await firebaseAuth
+                                    .createUserWithEmailAndPassword(
+                                        email: _emailController.text,
+                                        password: _passwordController.text);
+                            print(userCredential.user);
+                            authServcie.storeTokenandData(userCredential);
+                            Navigator.pushAndRemoveUntil(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (builder) => LandingPage(),
+                                ),
+                                (route) => false);
+                          } on Exception catch (e) {
+                            final snackBar = SnackBar(
+                                content: Text(
+                              e.toString(),
+                            ));
+                            ScaffoldMessenger.of(context)
+                                .showSnackBar(snackBar);
+                            setState(() {
+                              circular = false;
+                            });
+                          }
+                        },
                         child: Container(
                           margin: EdgeInsets.only(
                               left: Dimensions.width30,
@@ -101,8 +147,11 @@ class _SignupScreenState extends State<SignupScreen> {
                                   BorderRadius.circular(Dimensions.radius15),
                               color: AppColors.secColor),
                           child: Center(
-                              child: BigText(
-                                  text: "Sign Up", color: AppColors.textColor)),
+                              child: circular
+                                  ? CircularProgressIndicator()
+                                  : BigText(
+                                      text: "Sign Up",
+                                      color: AppColors.textColor)),
                         ),
                       ),
                     ],
