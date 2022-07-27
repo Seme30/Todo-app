@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:provider/provider.dart';
 import 'package:todoapp/TodoServices/todoController.dart';
-import 'package:todoapp/TodoServices/todoModel.dart';
-import 'package:todoapp/todo_provider.dart';
 import 'package:todoapp/TodoServices/dependencies.dart' as dep;
 import './screens/main_screen.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
-
-void main() async{
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dep.init();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   // Provider.debugCheckInvalidValueType = null;
   runApp(const MyApp());
 }
@@ -23,10 +24,8 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  
   @override
   Widget build(BuildContext context) {
-
     Get.find<TodoController>().getTodoList();
 
     return GetMaterialApp(
@@ -42,6 +41,6 @@ class _MyAppState extends State<MyApp> {
             backgroundColor: Color.fromRGBO(2, 111, 177, 1),
           ),
         ),
-        home: MainScreen());
+        home: AllScreen());
   }
 }
