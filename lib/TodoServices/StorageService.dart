@@ -26,6 +26,10 @@ class StorageService {
     await storage.write(key: 'listoftodos', value: jsonEncode(todosMap));
   }
 
+  Future<void> writeTodo(Map<String, dynamic> todo) async {
+    await storage.write(key: 'todo', value: jsonEncode(todo));
+  }
+
   Future<List<TodoModel>> getTodos() async {
     List<Map<String, dynamic>> todosMap = [];
     String? stringoftodos = await storage.read(key: 'listoftodos');

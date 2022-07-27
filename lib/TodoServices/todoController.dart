@@ -1,12 +1,13 @@
-
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:todoapp/TodoServices/StorageService.dart';
 import 'package:todoapp/TodoServices/todoModel.dart';
 import 'package:todoapp/TodoServices/todoRepo.dart';
 
 class TodoController extends GetxController {
+  StorageService storageService = StorageService();
 
   final TodoRepo todoRepo;
 
@@ -16,7 +17,7 @@ class TodoController extends GetxController {
   List<TodoModel> _todoList = [];
   List<TodoModel> get todoList => _todoList;
 
-   List<TodoModel> _completedTodoList = [];
+  List<TodoModel> _completedTodoList = [];
   List<TodoModel> get completedTodoList => _completedTodoList;
 
   List<TodoModel> _notcompletedTodoList = [];
@@ -25,51 +26,58 @@ class TodoController extends GetxController {
   bool _isLoaded = false;
   bool get isLoaded => _isLoaded;
 
-  TodoController({
-    required this.todoRepo
-  });
+  TodoController({required this.todoRepo});
 
   Future<void> getTodoList() async {
+    _todoList = [];
+    _todoList = await storageService.getTodos();
 
-    Response response = await todoRepo.getTodoList();
-    if(response.statusCode==200){
-      _todoList = [];
-      final List<dynamic> todolist = response.body; 
-      for (var element in todolist) { 
-        _todoList.add(TodoModel.fromJson(element));
-      }
-      for (var element in _todoList) { 
-        if(element.status=='completed'){
-          _completedTodoList.add(element);
-        } 
-      }
-       _isLoaded = true;
-      update();
-    } else if(response.statusCode==1){
-    } 
-    else{
-      print("Got no todos");
-    }
+    // Response response = await todoRepo.getTodoList();
+    // if(response.statusCode==200){
+    //   _todoList = [];
+    //   final List<dynamic> todolist = response.body;
+    //   for (var element in todolist) {
+    //     _todoList.add(TodoModel.fromJson(element));
+    //   }
+    //   for (var element in _todoList) {
+    //     if(element.status=='completed'){
+    //       _completedTodoList.add(element);
+    //     }
+    //   }
+    //    _isLoaded = true;
+    //   update();
+    // } else if(response.statusCode==1){
+    // }
+    // else{
+    //   print("Got no todos");
+    // }
   }
 
-  Future<void> createTodo(String todoTitle, String todoCreatedDate, String todoDeadline, String status) async {
-    Map<String,dynamic> data = {
+  Future<void> createTodo(String todoTitle, DateTime todoCreatedDate,
+      DateTime todoDeadline, String status) async {
+    Map<String, dynamic> data = {
       'todoTitle': todoTitle,
       'todoCreatedDate': todoCreatedDate,
       'todoDeadline': todoDeadline,
       'status': status
     };
-    Response response = await todoRepo.createTodo(data);
-    print(response.statusCode);
-    final todo = json.decode(response.body);
-    print(todo);
-    if(response.statusCode == 201){
-      print('201');
-      _todoModel = TodoModel.fromJson(todo);
-    } else {
-     GetSnackBar(title: "Todo List", message: "Todo Creation Failed",
-      backgroundColor: Colors.redAccent,);
-    }
-  }
 
+    _todoList = [];
+    await storageService.writeTodo(data);
+
+    // Response response = await todoRepo.createTodo(data);
+    // print(response.statusCode);
+    // final todo = json.decode(response.body);
+    // print(todo);
+    // if (response.statusCode == 201) {
+    //   print('201');
+    //   _todoModel = TodoModel.fromJson(todo);
+    // } else {
+    //   GetSnackBar(
+    //     title: "Todo List",
+    //     message: "Todo Creation Failed",
+    //     backgroundColor: Colors.redAccent,
+    //   );
+    // }
+  }
 }
