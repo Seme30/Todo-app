@@ -3,6 +3,7 @@ import 'package:todoapp/TodoServices/AuthService.dart';
 import 'package:todoapp/constants/colors.dart';
 import 'package:todoapp/constants/dimensions.dart';
 import 'package:todoapp/screens/phoneauth_screen.dart';
+import 'package:todoapp/screens/signup_screen.dart';
 import 'package:todoapp/screens/tabs_screen.dart';
 import 'package:todoapp/widgets/big_text.dart';
 import 'package:todoapp/widgets/small_text.dart';
@@ -158,10 +159,12 @@ class _SigninScreenState extends State<SigninScreen> {
                   ),
                 ),
               ),
-              // SizedBox(height: Dimensions.height15,),
+              SizedBox(
+                height: Dimensions.height15,
+              ),
               // SizedBox(height: Dimensions.height15,),
               Container(
-                margin: EdgeInsets.all(Dimensions.height30),
+                //margin: EdgeInsets.all(Dimensions.height30),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -169,11 +172,15 @@ class _SigninScreenState extends State<SigninScreen> {
                       text: 'Do not have an Account?',
                       color: AppColors.textColor,
                     ),
-                    SizedBox(
-                      width: Dimensions.width20,
-                    ),
                     InkWell(
-                      onTap: () {},
+                      onTap: () {
+                      	 Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(
+                          builder: (builder) => SignupScreen(),
+                        ),
+                        (route) => false);
+                      },
                       child: BigText(
                         text: 'Sign Up',
                         color: AppColors.textColor,
@@ -184,7 +191,9 @@ class _SigninScreenState extends State<SigninScreen> {
               ),
               SizedBox(height: Dimensions.height10),
               InkWell(
-                  onTap: () {},
+                  onTap: () {
+                   
+                  },
                   child: BigText(
                     text: 'Forgot Password?',
                     color: AppColors.textColor,

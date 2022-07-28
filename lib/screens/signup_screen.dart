@@ -4,6 +4,7 @@ import 'package:todoapp/TodoServices/AuthService.dart';
 import 'package:todoapp/constants/colors.dart';
 import 'package:todoapp/constants/dimensions.dart';
 import 'package:todoapp/screens/phoneauth_screen.dart';
+import 'package:todoapp/screens/sign_in_screen.dart';
 import 'package:todoapp/screens/tabs_screen.dart';
 import 'package:todoapp/widgets/big_text.dart';
 import 'package:todoapp/widgets/text_field.dart';
@@ -137,11 +138,11 @@ class _SignupScreenState extends State<SignupScreen> {
                         },
                         child: Container(
                           margin: EdgeInsets.only(
-                              left: Dimensions.width30,
-                              right: Dimensions.width30,
+                              left: Dimensions.width10,
+                              right: Dimensions.width10,
                               bottom: Dimensions.width20),
                           padding: EdgeInsets.symmetric(
-                              vertical: Dimensions.width20),
+                              vertical: Dimensions.width10),
                           decoration: BoxDecoration(
                               borderRadius:
                                   BorderRadius.circular(Dimensions.radius15),
@@ -158,10 +159,12 @@ class _SignupScreenState extends State<SignupScreen> {
                   ),
                 ),
               ),
-              // SizedBox(height: Dimensions.height15,),
+              SizedBox(
+                height: Dimensions.height15,
+              ),
               // SizedBox(height: Dimensions.height15,),
               Container(
-                margin: EdgeInsets.all(Dimensions.height30),
+                //margin: EdgeInsets.all(Dimensions.height30),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -184,7 +187,14 @@ class _SignupScreenState extends State<SignupScreen> {
               ),
               SizedBox(height: Dimensions.height10),
               InkWell(
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(
+                          builder: (builder) => SigninScreen(),
+                        ),
+                        (route) => false);
+                  },
                   child: BigText(
                     text: 'Forgot Password?',
                     color: AppColors.textColor,
