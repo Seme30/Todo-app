@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:provider/provider.dart';
 import 'package:todoapp/TodoServices/AuthService.dart';
+import 'package:todoapp/TodoServices/todoProvider.dart';
 import 'package:todoapp/screens/sign_in_screen.dart';
 import 'package:todoapp/screens/tabs_screen.dart';
 import './screens/main_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -12,8 +15,15 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  // Provider.debugCheckInvalidValueType = null;
-  runApp(const MyApp());
+  Provider.debugCheckInvalidValueType = null;
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => TodoProvider()),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatefulWidget {
@@ -44,6 +54,7 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+    Provider.of<TodoProvider>(context).readTodos();
     return MaterialApp(
         title: 'Flutter Demo',
         debugShowCheckedModeBanner: false,
