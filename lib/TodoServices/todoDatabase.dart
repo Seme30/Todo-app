@@ -35,7 +35,7 @@ CREATE TABLE $tableTodos (
   ${TodoFields.todoTitle} $textType,
   ${TodoFields.todoCreatedDate} $textType,
   ${TodoFields.todoDeadline} $textType,
-  ${TodoFields.status} $textType,
+  ${TodoFields.status} $textType
   )
 ''');
   }
