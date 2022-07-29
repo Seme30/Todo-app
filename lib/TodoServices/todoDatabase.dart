@@ -1,6 +1,9 @@
+import 'package:flutter/cupertino.dart';
 import 'package:path/path.dart';
+import 'package:provider/provider.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:todoapp/TodoServices/todoModel.dart';
+import 'package:todoapp/TodoServices/todoProvider.dart';
 
 class TodoDatabase {
   static final TodoDatabase instance = TodoDatabase._init();
@@ -12,12 +15,13 @@ class TodoDatabase {
   Future<Database> get database async {
     if (_database != null) return _database!;
 
-    _database = await _initDB('notes.db');
+    _database = await _initDB('todos.db');
     return _database!;
   }
 
   Future<Database> _initDB(String filePath) async {
     final dbPath = await getDatabasesPath();
+    print(dbPath);
     final path = join(dbPath, filePath);
 
     return await openDatabase(path, version: 1, onCreate: _createDB);
@@ -38,23 +42,49 @@ CREATE TABLE $tableTodos (
   ${TodoFields.status} $textType
   )
 ''');
+    await db.execute('''
+CREATE TABLE user ( 
+  token $textType
+  )
+''');
   }
 
-  Future<TodoModel> create(TodoModel todoModel) async {
+  Future<void> createUser(String user) async {
+    final db = await instance.database;
+    await db.rawInsert('INSERT INTO user (token) VALUES ("$user")');
+  }
+
+  Future<String> readUser() async {
+    final db = await instance.database;
+    final userlist = await db.query(
+      'user',
+    );
+    String token = userlist.first['token'] as String;
+    return token;
+  }
+
+  Future delete() async {
+    final db = await instance.database;
+
+    return await db.delete('user');
+  }
+
+  Future<TodoModel> createTodo(TodoModel todoModel, BuildContext con) async {
     final db = await instance.database;
     final json = {
-      'todoTitle': todoModel.todoTitle,
-      'todoCreatedDate': todoModel.todoCreatedDate,
-      'todoDeadline': todoModel.todoDeadline,
-      'status': todoModel.status
+      TodoFields.todoTitle: todoModel.todoTitle,
+      TodoFields.todoCreatedDate: todoModel.todoCreatedDate,
+      TodoFields.todoDeadline: todoModel.todoDeadline,
+      TodoFields.status: todoModel.status
     };
     final columns =
         '${TodoFields.todoTitle}, ${TodoFields.todoCreatedDate}, ${TodoFields.todoDeadline}, ${TodoFields.status}';
     final values =
-        '${json[TodoFields.todoTitle]}, ${json[TodoFields.todoCreatedDate]}, ${json[TodoFields.todoDeadline]}, ${json[TodoFields.status]}';
+        '"${json[TodoFields.todoTitle]}", "${json[TodoFields.todoCreatedDate]}", "${json[TodoFields.todoDeadline]}", "${json[TodoFields.status]}"';
     final id = await db
-        .rawInsert('INSERT INTO table_name ($columns) VALUES ($values)');
-
+        .rawInsert('INSERT INTO $tableTodos ($columns) VALUES ($values)');
+    // print('database entered');
+    Provider.of<TodoProvider>(con, listen: false).setTodo(todoModel);
     return todoModel.copy(id: id);
   }
 
@@ -84,7 +114,9 @@ CREATE TABLE $tableTodos (
 
     final result = await db.query(tableTodos, orderBy: orderBy);
 
-    return result.map((json) => TodoModel.fromJson(json)).toList();
+    final todoList = result.map((json) => TodoModel.fromJson(json)).toList();
+
+    return todoList;
   }
 
   // Future<int> update(TodoModel todoModel) async {

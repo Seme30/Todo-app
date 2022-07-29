@@ -1,27 +1,24 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:todoapp/TodoServices/todoDatabase.dart';
 import 'package:todoapp/screens/tabs_screen.dart';
 
 class AuthService {
   FirebaseAuth auth = FirebaseAuth.instance;
-  final storage = FlutterSecureStorage();
 
   Future<void> storeTokenandData(UserCredential userCredential) async {
-    await storage.write(
-        key: "token", value: userCredential.credential!.token.toString());
-    await storage.write(
-        key: "usercredintial", value: userCredential.toString());
+    await TodoDatabase.instance.createUser(userCredential.toString());
   }
 
-  Future<String?> getToken() async {
-    return await storage.read(key: "token");
+  Future<String> getToken() async {
+    return await TodoDatabase.instance.readUser();
   }
 
   Future<void> logOut(BuildContext context) async {
     try {
       await auth.signOut();
-      await storage.delete(key: "token");
+      await TodoDatabase.instance.delete();
     } catch (e) {
       final snackBar = SnackBar(
           content: Text(

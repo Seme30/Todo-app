@@ -8,24 +8,17 @@ class TodoProvider with ChangeNotifier {
   TodoModel get todo => _todo;
   List<TodoModel> _todos = [];
   List<TodoModel> get todos => _todos;
-  final database = TodoDatabase.instance;
 
-  Future<void> readTodos() async {
-    _todos = [];
-    _todos = await database.readAllTodos();
+  void setTodo(TodoModel todo) {
+    _todo = todo;
+    _todos.add(todo);
     isLoading = false;
     notifyListeners();
   }
 
-  Future<void> readTodo(int id) async {
-    _todo = await database.readTodo(id);
+  void setTodos(List<TodoModel> todos) {
+    _todos = todos;
     isLoading = false;
-    notifyListeners();
-  }
-
-  Future<void> createTodos(TodoModel todo) async {
-    TodoModel toodo = await database.create(todo);
-    _todos.add(toodo);
     notifyListeners();
   }
 }

@@ -38,7 +38,7 @@ class _SigninScreenState extends State<SigninScreen> {
       body: SingleChildScrollView(
         child: Container(
           margin: EdgeInsets.symmetric(
-              horizontal: Dimensions.width30 * 2, vertical: Dimensions.width20),
+              horizontal: Dimensions.width30, vertical: Dimensions.width20),
           height: Dimensions.screenHeight,
           width: Dimensions.screenWidth,
           child: Column(
@@ -116,8 +116,8 @@ class _SigninScreenState extends State<SigninScreen> {
                                 await firebaseAuth.signInWithEmailAndPassword(
                                     email: _emailController.text,
                                     password: _passwordController.text);
-                            print(userCredential.user);
-                            authServcie.storeTokenandData(userCredential);
+                            // print(userCredential);
+                            await authServcie.storeTokenandData(userCredential);
                             Navigator.pushAndRemoveUntil(
                                 context,
                                 MaterialPageRoute(
@@ -172,14 +172,17 @@ class _SigninScreenState extends State<SigninScreen> {
                       text: 'Do not have an Account?',
                       color: AppColors.textColor,
                     ),
+                    SizedBox(
+                      width: Dimensions.width10,
+                    ),
                     InkWell(
                       onTap: () {
-                      	 Navigator.pushAndRemoveUntil(
-                        context,
-                        MaterialPageRoute(
-                          builder: (builder) => SignupScreen(),
-                        ),
-                        (route) => false);
+                        Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(
+                              builder: (builder) => SignupScreen(),
+                            ),
+                            (route) => false);
                       },
                       child: BigText(
                         text: 'Sign Up',
@@ -191,9 +194,7 @@ class _SigninScreenState extends State<SigninScreen> {
               ),
               SizedBox(height: Dimensions.height10),
               InkWell(
-                  onTap: () {
-                   
-                  },
+                  onTap: () {},
                   child: BigText(
                     text: 'Forgot Password?',
                     color: AppColors.textColor,

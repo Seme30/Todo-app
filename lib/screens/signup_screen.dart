@@ -37,7 +37,7 @@ class _SignupScreenState extends State<SignupScreen> {
       body: SingleChildScrollView(
         child: Container(
           margin: EdgeInsets.symmetric(
-              horizontal: Dimensions.width30 * 2, vertical: Dimensions.width20),
+              horizontal: Dimensions.width30, vertical: Dimensions.width20),
           height: Dimensions.screenHeight,
           width: Dimensions.screenWidth,
           child: Column(
@@ -69,7 +69,7 @@ class _SignupScreenState extends State<SignupScreen> {
                     children: [
                       SvgPicture.asset('images/phone.svg'),
                       BigText(
-                        text: 'Continue with Mobile',
+                        text: 'Continue with phone',
                         color: AppColors.textColor,
                       )
                     ],
@@ -116,8 +116,8 @@ class _SignupScreenState extends State<SignupScreen> {
                                     .createUserWithEmailAndPassword(
                                         email: _emailController.text,
                                         password: _passwordController.text);
-                            print(userCredential.user);
-                            authServcie.storeTokenandData(userCredential);
+                            // print(userCredential.user);
+                            await authServcie.storeTokenandData(userCredential);
                             Navigator.pushAndRemoveUntil(
                                 context,
                                 MaterialPageRoute(
@@ -138,8 +138,8 @@ class _SignupScreenState extends State<SignupScreen> {
                         },
                         child: Container(
                           margin: EdgeInsets.only(
-                              left: Dimensions.width10,
-                              right: Dimensions.width10,
+                              left: Dimensions.width30,
+                              right: Dimensions.width30,
                               bottom: Dimensions.width20),
                           padding: EdgeInsets.symmetric(
                               vertical: Dimensions.width10),
@@ -176,7 +176,14 @@ class _SignupScreenState extends State<SignupScreen> {
                       width: Dimensions.width20,
                     ),
                     InkWell(
-                      onTap: () {},
+                      onTap: () {
+                        Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(
+                              builder: (builder) => SigninScreen(),
+                            ),
+                            (route) => false);
+                      },
                       child: BigText(
                         text: 'Log In',
                         color: AppColors.textColor,
@@ -187,14 +194,7 @@ class _SignupScreenState extends State<SignupScreen> {
               ),
               SizedBox(height: Dimensions.height10),
               InkWell(
-                  onTap: () {
-                    Navigator.pushAndRemoveUntil(
-                        context,
-                        MaterialPageRoute(
-                          builder: (builder) => SigninScreen(),
-                        ),
-                        (route) => false);
-                  },
+                  onTap: () {},
                   child: BigText(
                     text: 'Forgot Password?',
                     color: AppColors.textColor,

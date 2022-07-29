@@ -8,28 +8,33 @@ import 'package:todoapp/screens/incomplete_screen.dart';
 import 'package:todoapp/screens/main_screen.dart';
 
 class LandingPage extends StatelessWidget {
- 
   buildBottomNavigationMenu(context, landingPageController) {
     return Obx(() => MediaQuery(
         data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
         child: SizedBox(
           child: BottomNavigationBar(
-            backgroundColor: AppColors.mainColor,
-            // fixedColor: AppColors.textColor2,
-            type: BottomNavigationBarType.fixed,
-            selectedItemColor: AppColors.textColor,
-            unselectedItemColor: AppColors.textColor2,
-            onTap: landingPageController.changeTabIndex,
-            currentIndex: landingPageController.tabIndex.value,
-            items: const [
-              BottomNavigationBarItem(
-                icon: Icon(Icons.list,color: AppColors.iconColor1,), 
-              label: 'All'
-              ),
-              BottomNavigationBarItem(icon: Icon(Icons.circle, color: AppColors.iconColor1), label: 'Completed'),
-              BottomNavigationBarItem(icon: Icon(Icons.circle_outlined,color: AppColors.iconColor1), label: 'InComplete')
-             ]
-          ),
+              backgroundColor: AppColors.mainColor,
+              // fixedColor: AppColors.textColor2,
+              type: BottomNavigationBarType.fixed,
+              selectedItemColor: AppColors.textColor,
+              unselectedItemColor: AppColors.textColor2,
+              onTap: landingPageController.changeTabIndex,
+              currentIndex: landingPageController.tabIndex.value,
+              items: const [
+                BottomNavigationBarItem(
+                    icon: Icon(
+                      Icons.list,
+                      color: AppColors.iconColor1,
+                    ),
+                    label: 'All'),
+                BottomNavigationBarItem(
+                    icon: Icon(Icons.circle, color: AppColors.iconColor1),
+                    label: 'Completed'),
+                BottomNavigationBarItem(
+                    icon: Icon(Icons.circle_outlined,
+                        color: AppColors.iconColor1),
+                    label: 'InComplete')
+              ]),
         )));
   }
 

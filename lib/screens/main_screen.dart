@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:provider/provider.dart';
 import 'package:todoapp/TodoServices/todoDatabase.dart';
 import 'package:todoapp/TodoServices/todoModel.dart';
+import 'package:todoapp/TodoServices/todoProvider.dart';
 import 'package:todoapp/constants/colors.dart';
 import 'package:todoapp/constants/dimensions.dart';
 import 'package:todoapp/screens/sign_in_screen.dart';
+import 'package:todoapp/utils/date_and_time_picker.dart';
 import 'package:todoapp/widgets/big_text.dart';
 import 'package:todoapp/widgets/small_text.dart';
+import 'package:todoapp/widgets/text_field.dart';
 import 'package:todoapp/widgets/todo_list.dart';
+import 'package:intl/intl.dart';
 
 class AllScreen extends StatefulWidget {
   @override
@@ -15,26 +20,122 @@ class AllScreen extends StatefulWidget {
 }
 
 class _AllScreenState extends State<AllScreen> {
-  late List<TodoModel> todos;
-  bool isLoading = false;
+  TextEditingController titleController = TextEditingController();
+  String selectedDateTime = 'Select deadline';
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    refreshTodos();
   }
 
-  Future refreshTodos() async {
-    setState(() => isLoading = true);
+  Future refreshTodos(TodoProvider todoProvider) async {
+    final todos = await TodoDatabase.instance.readAllTodos();
+    todoProvider.setTodos(todos);
+  }
 
-    todos = await TodoDatabase.instance.readAllTodos();
+  @override
+  void dispose() {
+    TodoDatabase.instance.close();
+    super.dispose();
+  }
 
-    setState(() => isLoading = false);
+  Future<dynamic> showModal(BuildContext con, TodoProvider todoProvider) {
+    DateTimePicker dateTimePicker = DateTimePicker();
+
+    return showModalBottomSheet(
+        context: con,
+        builder: (builder) {
+          return Container(
+            padding: EdgeInsets.only(
+                left: Dimensions.width15,
+                right: Dimensions.width15,
+                top: Dimensions.height10),
+            decoration: BoxDecoration(color: AppColors.mainColor),
+            child: Expanded(
+                child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                TextFieldBuilder(
+                  validator: 'please add task title',
+                  controller: titleController,
+                  labelText: 'Task Title',
+                  obsecureText: false,
+                ),
+                SizedBox(
+                  height: Dimensions.width20,
+                ),
+                Container(
+                  margin: EdgeInsets.only(
+                      left: Dimensions.width30,
+                      right: Dimensions.width30,
+                      bottom: Dimensions.width20),
+                  padding: EdgeInsets.symmetric(vertical: Dimensions.width20),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      BigText(
+                        text: selectedDateTime,
+                        color: AppColors.textColor,
+                      ),
+                      SizedBox(
+                        width: Dimensions.width10,
+                      ),
+                      IconButton(
+                          onPressed: () async {
+                            await dateTimePicker.selectDateTime(con);
+                            setState(() {
+                              selectedDateTime = dateTimePicker.getDateTime();
+                            });
+                          },
+                          icon: Icon(Icons.calendar_today_outlined)),
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  height: Dimensions.width20,
+                ),
+                InkWell(
+                  onTap: () {
+                    final todo = TodoModel(
+                        todoTitle: titleController.text,
+                        todoDeadline: selectedDateTime,
+                        todoCreatedDate: DateFormat('yyyy-MM-dd HH: ss a')
+                            .format(DateTime.now()),
+                        status: 'Incomplete');
+                    print(todo.todoTitle);
+                    creatingTodos(todo);
+                  },
+                  child: Container(
+                    margin: EdgeInsets.only(
+                        left: Dimensions.width30,
+                        right: Dimensions.width30,
+                        bottom: Dimensions.width20),
+                    padding: EdgeInsets.symmetric(vertical: Dimensions.width20),
+                    decoration: BoxDecoration(
+                        borderRadius:
+                            BorderRadius.circular(Dimensions.radius15),
+                        color: AppColors.secColor),
+                    child: Center(
+                        child: BigText(
+                            text: "Add Task", color: AppColors.textColor)),
+                  ),
+                ),
+              ],
+            )),
+          );
+        });
+  }
+
+  void creatingTodos(todo) async {
+    await TodoDatabase.instance.createTodo(todo, context);
   }
 
   @override
   Widget build(BuildContext context) {
+    TodoProvider todoProvider =
+        Provider.of<TodoProvider>(context, listen: true);
+    refreshTodos(todoProvider);
     return Scaffold(
       appBar: AppBar(
         title: BigText(
@@ -72,21 +173,27 @@ class _AllScreenState extends State<AllScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             SizedBox(height: Dimensions.height30),
-            isLoading
+            todoProvider.isLoading
                 ? Center(child: CircularProgressIndicator())
-                : todos.isEmpty
-                    ? BigText(text: 'No Todos')
+                : todoProvider.todos.isEmpty
+                    ? BigText(
+                        text: 'No Todos',
+                        color: AppColors.textColor,
+                      )
                     : Expanded(
                         child: SingleChildScrollView(
                           child: Container(
                             height: Dimensions.height45 * 10,
                             child: ListView.builder(
-                                itemCount: todos.length,
+                                itemCount: todoProvider.todos.length,
                                 itemBuilder: (context, index) {
                                   return TodoList(
-                                      title: todos[index].todoTitle!,
-                                      date: todos[index].todoDeadline!,
-                                      status: todos[index].status!);
+                                      title:
+                                          todoProvider.todos[index].todoTitle!,
+                                      date: todoProvider
+                                          .todos[index].todoDeadline!,
+                                      status:
+                                          todoProvider.todos[index].status!);
                                 }),
                           ),
                         ),
@@ -103,7 +210,9 @@ class _AllScreenState extends State<AllScreen> {
                 children: [
                   SmallText(text: "Add a Task", color: AppColors.textColor),
                   GestureDetector(
-                      onTap: () {},
+                      onTap: () {
+                        showModal(context, todoProvider);
+                      },
                       child: Icon(Icons.add, color: AppColors.textColor)),
                 ],
               ),
@@ -111,6 +220,7 @@ class _AllScreenState extends State<AllScreen> {
           ],
         ),
       ),
+
       //  bottomNavigationBar: BottomNavigationBar(
 
       //     backgroundColor: AppColors.mainColor,

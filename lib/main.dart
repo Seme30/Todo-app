@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:todoapp/TodoServices/AuthService.dart';
+import 'package:todoapp/TodoServices/todoDatabase.dart';
 import 'package:todoapp/TodoServices/todoProvider.dart';
 import 'package:todoapp/screens/sign_in_screen.dart';
 import 'package:todoapp/screens/tabs_screen.dart';
@@ -35,39 +35,31 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   Widget currentWidget = SigninScreen();
+  bool loggedin = false;
   AuthService authService = AuthService();
 
-  void checkLogin() async {
-    String? token = await authService.getToken();
-    print("token");
-    if (token != null)
-      setState(() {
-        currentWidget = LandingPage();
-      });
+  late Future<String> getToken;
+
+  Future<String> checkLogin() async {
+    String result = await authService.getToken();
+    if (result.isNotEmpty) {
+      loggedin = true;
+    }
+    return result;
   }
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
+    checkLogin();
+    getToken = checkLogin();
   }
 
   @override
   Widget build(BuildContext context) {
-    Provider.of<TodoProvider>(context).readTodos();
     return MaterialApp(
-        title: 'Flutter Demo',
+        title: 'Todo App',
         debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSwatch().copyWith(
-            primary: const Color.fromRGBO(1, 49, 88, 1),
-            secondary: Colors.white,
-            tertiary: const Color.fromRGBO(2, 111, 177, 1),
-          ),
-          appBarTheme: const AppBarTheme(
-            backgroundColor: Color.fromRGBO(2, 111, 177, 1),
-          ),
-        ),
-        home: currentWidget);
+        home: loggedin ? LandingPage() : SigninScreen());
   }
 }
