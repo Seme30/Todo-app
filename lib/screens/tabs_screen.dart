@@ -13,7 +13,8 @@ class LandingPage extends StatelessWidget {
         data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
         child: SizedBox(
           child: BottomNavigationBar(
-              backgroundColor: AppColors.mainColor,
+              backgroundColor: AppColors.secColor,
+              elevation: 2,
               // fixedColor: AppColors.textColor2,
               type: BottomNavigationBarType.fixed,
               selectedItemColor: AppColors.textColor,

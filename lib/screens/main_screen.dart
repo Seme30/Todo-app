@@ -1,6 +1,8 @@
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:provider/provider.dart';
+import 'package:todoapp/TodoServices/DateProvider.dart';
+import 'package:todoapp/TodoServices/NotificationService.dart';
 import 'package:todoapp/TodoServices/todoDatabase.dart';
 import 'package:todoapp/TodoServices/todoModel.dart';
 import 'package:todoapp/TodoServices/todoProvider.dart';
@@ -21,12 +23,73 @@ class AllScreen extends StatefulWidget {
 
 class _AllScreenState extends State<AllScreen> {
   TextEditingController titleController = TextEditingController();
-  String selectedDateTime = 'Select deadline';
+  String selectedDateTime = 'Schedule task';
+  NotificationService notificationService = NotificationService();
+  DateTime schedule = DateTime.now();
+  late TodoModel thisTodo;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    AwesomeNotifications().isNotificationAllowed().then(
+      (isAllowed) {
+        if (!isAllowed) {
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: Text('Allow Notifications'),
+              content: Text('Our app would like to send you notifications'),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text(
+                    'Don\'t Allow',
+                    style: TextStyle(color: Colors.grey, fontSize: 18),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () => AwesomeNotifications()
+                      .requestPermissionToSendNotifications()
+                      .then((_) => Navigator.pop(context)),
+                  child: Text(
+                    'Allow',
+                    style: TextStyle(
+                      color: Colors.teal,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
+      },
+    );
+
+    AwesomeNotifications().createdStream.listen((notification) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(
+          'Notification Created on ${notification.channelKey}',
+        ),
+      ));
+    });
+
+    AwesomeNotifications().actionStream.listen((notification) async {
+      if (notification.channelKey == 'scheduled_channel') {
+        AwesomeNotifications().getGlobalBadgeCounter().then(
+              (value) =>
+                  AwesomeNotifications().setGlobalBadgeCounter(value - 1),
+            );
+        final todo = Provider.of<TodoProvider>(context, listen: false)
+            .getTodo(notification.id!);
+        todo.status = "Completed";
+        await TodoDatabase.instance.update(todo);
+      }
+    });
   }
 
   Future refreshTodos(TodoProvider todoProvider) async {
@@ -37,21 +100,25 @@ class _AllScreenState extends State<AllScreen> {
   @override
   void dispose() {
     TodoDatabase.instance.close();
+    AwesomeNotifications().actionSink.close();
+    AwesomeNotifications().createdSink.close();
     super.dispose();
   }
 
-  Future<dynamic> showModal(BuildContext con, TodoProvider todoProvider) {
+  Future<dynamic> showModal(BuildContext con) {
     DateTimePicker dateTimePicker = DateTimePicker();
-
     return showModalBottomSheet(
         context: con,
-        builder: (builder) {
+        builder: (context) {
           return Container(
             padding: EdgeInsets.only(
                 left: Dimensions.width15,
                 right: Dimensions.width15,
                 top: Dimensions.height10),
-            decoration: BoxDecoration(color: AppColors.mainColor),
+            decoration: BoxDecoration(
+                color: AppColors.mainColor,
+                borderRadius: BorderRadius.circular(Dimensions.radius15),
+                border: Border.all(color: AppColors.iconColor1, width: 2)),
             child: Expanded(
                 child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -71,6 +138,9 @@ class _AllScreenState extends State<AllScreen> {
                       right: Dimensions.width30,
                       bottom: Dimensions.width20),
                   padding: EdgeInsets.symmetric(vertical: Dimensions.width20),
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(Dimensions.radius15),
+                      color: AppColors.secColor),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -81,14 +151,32 @@ class _AllScreenState extends State<AllScreen> {
                       SizedBox(
                         width: Dimensions.width10,
                       ),
-                      IconButton(
-                          onPressed: () async {
-                            await dateTimePicker.selectDateTime(con);
-                            setState(() {
-                              selectedDateTime = dateTimePicker.getDateTime();
-                            });
-                          },
-                          icon: Icon(Icons.calendar_today_outlined)),
+                      Container(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: Dimensions.height15,
+                            vertical: Dimensions.height10),
+                        decoration: BoxDecoration(
+                          borderRadius:
+                              BorderRadius.circular(Dimensions.radius15),
+                          color: AppColors.iconColor1,
+                        ),
+                        child: IconButton(
+                            onPressed: () async {
+                              await dateTimePicker.selectDateTime(
+                                context,
+                              );
+                              setState(() {
+                                selectedDateTime = dateTimePicker
+                                    .getDateTime()
+                                    .substring(0, 10);
+                                schedule = dateTimePicker.getDateTime2();
+                              });
+                            },
+                            icon: Icon(
+                              Icons.calendar_today_outlined,
+                              color: AppColors.textColor,
+                            )),
+                      ),
                     ],
                   ),
                 ),
@@ -104,7 +192,7 @@ class _AllScreenState extends State<AllScreen> {
                             .format(DateTime.now()),
                         status: 'Incomplete');
                     print(todo.todoTitle);
-                    creatingTodos(todo);
+                    creatingTodos(todo, context, schedule);
                   },
                   child: Container(
                     margin: EdgeInsets.only(
@@ -127,22 +215,24 @@ class _AllScreenState extends State<AllScreen> {
         });
   }
 
-  void creatingTodos(todo) async {
-    await TodoDatabase.instance.createTodo(todo, context);
+  void creatingTodos(todo, BuildContext con, DateTime schedule) async {
+    thisTodo = await TodoDatabase.instance.createTodo(todo, con, schedule);
   }
 
   @override
   Widget build(BuildContext context) {
     TodoProvider todoProvider =
         Provider.of<TodoProvider>(context, listen: true);
+    DateProvider date = Provider.of<DateProvider>(context, listen: true);
     refreshTodos(todoProvider);
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: AppColors.secColor,
         title: BigText(
           text: 'Tasks',
-          color: Colors.blueAccent,
+          color: AppColors.textColor,
         ),
-        elevation: 0,
+        elevation: 2,
         centerTitle: true,
         actions: [
           IconButton(
@@ -164,15 +254,15 @@ class _AllScreenState extends State<AllScreen> {
         padding: EdgeInsets.only(
             left: Dimensions.width20,
             right: Dimensions.width20,
-            top: Dimensions.height45),
-        height: MediaQuery.of(context).size.height,
-        width: double.maxFinite,
+            top: Dimensions.height20),
+        height: Dimensions.screenHeight,
+        width: Dimensions.screenWidth,
         decoration: BoxDecoration(color: AppColors.mainColor),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            SizedBox(height: Dimensions.height30),
+            SizedBox(height: Dimensions.height10),
             todoProvider.isLoading
                 ? Center(child: CircularProgressIndicator())
                 : todoProvider.todos.isEmpty
@@ -180,25 +270,23 @@ class _AllScreenState extends State<AllScreen> {
                         text: 'No Todos',
                         color: AppColors.textColor,
                       )
-                    : Expanded(
+                    : Container(
+                        height: Dimensions.height45 * 10,
+                        width: Dimensions.screenWidth,
                         child: SingleChildScrollView(
-                          child: Container(
-                            height: Dimensions.height45 * 10,
-                            child: ListView.builder(
-                                itemCount: todoProvider.todos.length,
-                                itemBuilder: (context, index) {
-                                  return TodoList(
-                                      title:
-                                          todoProvider.todos[index].todoTitle!,
-                                      date: todoProvider
-                                          .todos[index].todoDeadline!,
-                                      status:
-                                          todoProvider.todos[index].status!);
-                                }),
-                          ),
+                          child: ListView.builder(
+                              itemCount: todoProvider.todos.length,
+                              itemBuilder: (context, index) {
+                                return TodoList(
+                                    title: todoProvider.todos[index].todoTitle!,
+                                    date: date.dateTime[thisTodo.id]!,
+                                    status: todoProvider.todos[index].status!);
+                              }),
                         ),
                       ),
             Container(
+              height: Dimensions.height45 + Dimensions.height54,
+              width: Dimensions.screenWidth,
               padding: EdgeInsets.symmetric(
                   horizontal: Dimensions.width20, vertical: Dimensions.width20),
               margin: EdgeInsets.only(bottom: Dimensions.height30),
@@ -209,66 +297,20 @@ class _AllScreenState extends State<AllScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   SmallText(text: "Add a Task", color: AppColors.textColor),
-                  GestureDetector(
-                      onTap: () {
-                        showModal(context, todoProvider);
+                  IconButton(
+                      onPressed: () async {
+                        await showModal(context);
+                        await notificationService
+                            .createTodoReminderNotification(schedule, thisTodo);
                       },
-                      child: Icon(Icons.add, color: AppColors.textColor)),
+                      icon: Icon(Icons.add),
+                      color: AppColors.textColor),
                 ],
               ),
             ),
           ],
         ),
       ),
-
-      //  bottomNavigationBar: BottomNavigationBar(
-
-      //     backgroundColor: AppColors.mainColor,
-      //       // fixedColor: AppColors.textColor2,
-      //       type: BottomNavigationBarType.fixed,
-      //       selectedItemColor: AppColors.textColor,
-      //       unselectedItemColor: AppColors.textColor2,
-      //       currentIndex: 0,
-      //       items: const [
-      //         BottomNavigationBarItem(
-      //           icon: Icon(Icons.list,color: AppColors.iconColor1,),
-      //         label: 'All'
-      //         ),
-      //         BottomNavigationBarItem(icon: Icon(Icons.circle, color: AppColors.iconColor1), label: 'Completed'),
-      //         BottomNavigationBarItem(icon: Icon(Icons.circle_outlined,color: AppColors.iconColor1), label: 'InComplete')
-      //        ])
     );
   }
 }
-
-// ListView(
-//                                     children: snaphot.data!.map((e){
-//                                     return TodoList(title: e.todoTitle!, date: e.todoDeadline!, status: e.status!);
-//                                   }).toList(),
-//                                   )
-// Container(
-//         padding: EdgeInsets.symmetric(horizontal: Dimensions.width20, vertical: Dimensions.width20),
-//         child: Row(
-//           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//           children: [
-//             Column(
-//               children: [
-//                 Icon(Icons.list),
-//                 SmallText(text: 'All',),
-//               ],
-//             ),
-//             Column(
-//               children: [
-//                 Icon(Icons.circle),
-//                 SmallText(text: 'Complted',),
-//               ],
-//             ),
-//             Column(
-//               children: [
-//                 Icon(Icons.circle_outlined),
-//                 SmallText(text: 'Incomplete',),
-//               ],
-//             )
-//           ],
-//         ),
-//       ),
