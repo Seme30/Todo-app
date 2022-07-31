@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:path/path.dart';
 import 'package:provider/provider.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:todoapp/TodoServices/DateProvider.dart';
 import 'package:todoapp/TodoServices/todoModel.dart';
 import 'package:todoapp/TodoServices/todoProvider.dart';
 
@@ -42,34 +43,10 @@ CREATE TABLE $tableTodos (
   ${TodoFields.status} $textType
   )
 ''');
-    await db.execute('''
-CREATE TABLE user ( 
-  token $textType
-  )
-''');
   }
 
-  Future<void> createUser(String user) async {
-    final db = await instance.database;
-    await db.rawInsert('INSERT INTO user (token) VALUES ("$user")');
-  }
-
-  Future<String> readUser() async {
-    final db = await instance.database;
-    final userlist = await db.query(
-      'user',
-    );
-    String token = userlist.first['token'] as String;
-    return token;
-  }
-
-  Future delete() async {
-    final db = await instance.database;
-
-    return await db.delete('user');
-  }
-
-  Future<TodoModel> createTodo(TodoModel todoModel, BuildContext con) async {
+  Future<TodoModel> createTodo(
+      TodoModel todoModel, BuildContext con, DateTime schedule) async {
     final db = await instance.database;
     final json = {
       TodoFields.todoTitle: todoModel.todoTitle,
@@ -84,7 +61,9 @@ CREATE TABLE user (
     final id = await db
         .rawInsert('INSERT INTO $tableTodos ($columns) VALUES ($values)');
     // print('database entered');
+    todoModel.id = id;
     Provider.of<TodoProvider>(con, listen: false).setTodo(todoModel);
+    Provider.of<DateProvider>(con, listen: false).setDate(id, schedule);
     return todoModel.copy(id: id);
   }
 
@@ -119,16 +98,16 @@ CREATE TABLE user (
     return todoList;
   }
 
-  // Future<int> update(TodoModel todoModel) async {
-  //   final db = await instance.database;
+  Future<int> update(TodoModel todoModel) async {
+    final db = await instance.database;
 
-  //   return db.update(
-  //     tableNotes,
-  //     note.toJson(),
-  //     where: '${NoteFields.id} = ?',
-  //     whereArgs: [note.id],
-  //   );
-  // }
+    return db.update(
+      tableTodos,
+      todoModel.toJson(todoModel),
+      where: '${TodoFields.id} = ?',
+      whereArgs: [todoModel.id],
+    );
+  }
 
   // Future<int> delete(int id) async {
   //   final db = await instance.database;
