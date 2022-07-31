@@ -1,24 +1,28 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:todoapp/TodoServices/todoDatabase.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:todoapp/screens/tabs_screen.dart';
 
 class AuthService {
   FirebaseAuth auth = FirebaseAuth.instance;
+  // Obtain shared preferences.
 
   Future<void> storeTokenandData(UserCredential userCredential) async {
-    await TodoDatabase.instance.createUser(userCredential.toString());
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('usercredintial', userCredential.toString());
   }
 
   Future<String> getToken() async {
-    return await TodoDatabase.instance.readUser();
+    final prefs = await SharedPreferences.getInstance();
+    String? cred = prefs.getString("usercredintial");
+    return cred as String;
   }
 
   Future<void> logOut(BuildContext context) async {
     try {
       await auth.signOut();
-      await TodoDatabase.instance.delete();
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove("usercredintial");
     } catch (e) {
       final snackBar = SnackBar(
           content: Text(
