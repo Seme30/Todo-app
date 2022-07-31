@@ -1,25 +1,40 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:todoapp/TodoServices/AuthService.dart';
-import 'package:todoapp/TodoServices/todoDatabase.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:todoapp/TodoServices/DateProvider.dart';
 import 'package:todoapp/TodoServices/todoProvider.dart';
+import 'package:todoapp/constants/colors.dart';
 import 'package:todoapp/screens/sign_in_screen.dart';
 import 'package:todoapp/screens/tabs_screen.dart';
-import './screens/main_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:provider/provider.dart';
+import 'package:todoapp/widgets/big_text.dart';
 import 'firebase_options.dart';
+import 'package:awesome_notifications/awesome_notifications.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  await AwesomeNotifications().initialize(
+    'resource://drawable/launch_background',
+    [
+      NotificationChannel(
+        channelKey: 'scheduled_channel',
+        channelName: 'Scheduled Notifications',
+        channelDescription: 'Channel Description',
+        defaultColor: Colors.teal,
+        locked: true,
+        importance: NotificationImportance.High,
+      ),
+    ],
+  );
   Provider.debugCheckInvalidValueType = null;
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => TodoProvider()),
+        ChangeNotifierProvider(create: (_) => DateProvider())
       ],
       child: const MyApp(),
     ),
@@ -36,30 +51,54 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   Widget currentWidget = SigninScreen();
   bool loggedin = false;
-  AuthService authService = AuthService();
 
-  late Future<String> getToken;
+  late Future<bool> log;
 
-  Future<String> checkLogin() async {
-    String result = await authService.getToken();
+  Future<bool> checkLogin() async {
+    final prefs = await SharedPreferences.getInstance();
+    String result = prefs.getString('usercredintial') as String;
     if (result.isNotEmpty) {
-      loggedin = true;
+      setState(() {
+        loggedin = true;
+      });
     }
-    return result;
+    return loggedin;
   }
 
   @override
   void initState() {
     super.initState();
-    checkLogin();
-    getToken = checkLogin();
+    log = checkLogin();
   }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-        title: 'Todo App',
-        debugShowCheckedModeBanner: false,
-        home: loggedin ? LandingPage() : SigninScreen());
+    return FutureBuilder<bool>(
+        future: log,
+        builder: ((context, snapshot) {
+          while (snapshot.connectionState == ConnectionState.done) {
+            if (snapshot.hasData) {
+              return MaterialApp(
+                  title: 'Todo App',
+                  debugShowCheckedModeBanner: false,
+                  home: LandingPage());
+            } else {
+              return MaterialApp(
+                  title: 'Todo App',
+                  debugShowCheckedModeBanner: false,
+                  home: SigninScreen());
+            }
+          }
+          return MaterialApp(
+            home: Scaffold(
+              backgroundColor: AppColors.mainColor,
+              body: Center(
+                  child: BigText(
+                text: "Loading...",
+                color: AppColors.textColor,
+              )),
+            ),
+          );
+        }));
   }
 }
