@@ -9,7 +9,6 @@ import 'package:todoapp/widgets/big_text.dart';
 import 'package:todoapp/widgets/small_text.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:todoapp/widgets/text_field.dart';
-import 'package:flutter_svg/svg.dart';
 
 class SigninScreen extends StatefulWidget {
   const SigninScreen({Key? key}) : super(key: key);
@@ -58,24 +57,18 @@ class _SigninScreenState extends State<SigninScreen> {
                   );
                 },
                 child: Container(
-                  height: Dimensions.height20 * 4,
-                  padding: EdgeInsets.symmetric(
-                      horizontal: Dimensions.width20,
-                      vertical: Dimensions.width20),
-                  decoration: BoxDecoration(
-                      color: AppColors.secColor,
-                      borderRadius: BorderRadius.circular(Dimensions.radius15)),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SvgPicture.asset('images/phone.svg'),
-                      BigText(
-                        text: 'Continue with phone',
-                        color: AppColors.textColor,
-                      )
-                    ],
-                  ),
-                ),
+                    height: Dimensions.height20 * 4,
+                    padding: EdgeInsets.symmetric(
+                        horizontal: Dimensions.width20,
+                        vertical: Dimensions.width20),
+                    decoration: BoxDecoration(
+                        color: AppColors.secColor,
+                        borderRadius:
+                            BorderRadius.circular(Dimensions.radius15)),
+                    child: BigText(
+                      text: 'Continue with phone',
+                      color: AppColors.textColor,
+                    )),
               ),
               SizedBox(
                 height: Dimensions.height30,

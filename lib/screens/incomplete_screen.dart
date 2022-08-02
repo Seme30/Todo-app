@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:todoapp/TodoServices/DateProvider.dart';
 import 'package:todoapp/TodoServices/todoModel.dart';
 import 'package:todoapp/TodoServices/todoProvider.dart';
 import 'package:todoapp/constants/colors.dart';
@@ -15,30 +14,28 @@ class InCompletedScreen extends StatefulWidget {
 }
 
 class _InCompletedScreenState extends State<InCompletedScreen> {
+  // late List<TodoModel> todos;
+
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    final todos = Provider.of<TodoProvider>(context).todos;
+    final todos = Provider.of<TodoProvider>(context);
     List<TodoModel> incompletedList = [];
-    for (var element in todos) {
+    for (var element in todos.todos) {
       if (element.status == 'Incomplete') {
         incompletedList.add(element);
       }
     }
-
-    final date = Provider.of<DateProvider>(context).date;
-
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.secColor,
         title: BigText(
           text: 'Tasks',
-          color: Colors.blueAccent,
+          color: AppColors.textColor,
         ),
         elevation: 2,
         centerTitle: true,
@@ -68,7 +65,7 @@ class _InCompletedScreenState extends State<InCompletedScreen> {
         decoration: BoxDecoration(color: AppColors.mainColor),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
             SizedBox(height: Dimensions.height10),
             incompletedList.isEmpty
@@ -76,16 +73,17 @@ class _InCompletedScreenState extends State<InCompletedScreen> {
                 : Container(
                     height: Dimensions.height45 * 10,
                     child: Expanded(
-                      child: SingleChildScrollView(
-                        child: ListView.builder(
-                            itemCount: incompletedList.length,
-                            itemBuilder: (context, index) {
-                              return TodoList(
-                                  title: incompletedList[index].todoTitle!,
-                                  date: date,
-                                  status: incompletedList[index].status!);
-                            }),
-                      ),
+                      child: ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: incompletedList.length,
+                          itemBuilder: (context, index) {
+                            return TodoList(
+                              id: incompletedList[index].id!,
+                              title: incompletedList[index].todoTitle!,
+                              date: incompletedList[index].todoDeadline!,
+                              status: incompletedList[index].status!,
+                            );
+                          }),
                     ),
                   ),
           ],

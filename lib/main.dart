@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:todoapp/TodoServices/DateProvider.dart';
 import 'package:todoapp/TodoServices/todoProvider.dart';
 import 'package:todoapp/constants/colors.dart';
 import 'package:todoapp/screens/sign_in_screen.dart';
@@ -34,7 +33,6 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => TodoProvider()),
-        ChangeNotifierProvider(create: (_) => DateProvider())
       ],
       child: const MyApp(),
     ),
@@ -73,6 +71,7 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+    Provider.of<TodoProvider>(context, listen: false).readTodos();
     return FutureBuilder<bool>(
         future: log,
         builder: ((context, snapshot) {

@@ -6,11 +6,9 @@ class TextFieldBuilder extends StatelessWidget {
   final String labelText;
   final TextEditingController controller;
   final bool obsecureText;
-  final String? validator;
 
   const TextFieldBuilder(
       {Key? key,
-      this.validator,
       required this.labelText,
       required this.controller,
       required this.obsecureText})
@@ -23,12 +21,6 @@ class TextFieldBuilder extends StatelessWidget {
           horizontal: Dimensions.height20 * 2, vertical: Dimensions.height20),
       height: Dimensions.height20 * 6,
       child: TextFormField(
-        validator: (value) {
-          if (value!.isEmpty) {
-            return validator;
-          }
-          return '';
-        },
         controller: controller,
         obscureText: obsecureText,
         style: TextStyle(

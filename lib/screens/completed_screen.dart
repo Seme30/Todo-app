@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:todoapp/TodoServices/DateProvider.dart';
 import 'package:todoapp/TodoServices/todoModel.dart';
 import 'package:todoapp/TodoServices/todoProvider.dart';
 import 'package:todoapp/constants/colors.dart';
@@ -15,7 +14,7 @@ class CompletedScreen extends StatefulWidget {
 }
 
 class _CompletedScreenState extends State<CompletedScreen> {
-  late List<TodoModel> todos;
+  // late List<TodoModel> todos;
 
   @override
   void initState() {
@@ -24,14 +23,13 @@ class _CompletedScreenState extends State<CompletedScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final todos = Provider.of<TodoProvider>(context).todos;
+    final todos = Provider.of<TodoProvider>(context);
     List<TodoModel> completedList = [];
-    for (var element in todos) {
+    for (var element in todos.todos) {
       if (element.status == 'Completed') {
         completedList.add(element);
       }
     }
-    final date = Provider.of<DateProvider>(context).date;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.secColor,
@@ -67,7 +65,7 @@ class _CompletedScreenState extends State<CompletedScreen> {
         decoration: BoxDecoration(color: AppColors.mainColor),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
             SizedBox(height: Dimensions.height10),
             completedList.isEmpty
@@ -75,16 +73,17 @@ class _CompletedScreenState extends State<CompletedScreen> {
                 : Container(
                     height: Dimensions.height45 * 10,
                     child: Expanded(
-                      child: SingleChildScrollView(
-                        child: ListView.builder(
-                            itemCount: completedList.length,
-                            itemBuilder: (context, index) {
-                              return TodoList(
-                                  title: completedList[index].todoTitle!,
-                                  date: date,
-                                  status: completedList[index].status!);
-                            }),
-                      ),
+                      child: ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: completedList.length,
+                          itemBuilder: (context, index) {
+                            return TodoList(
+                              id: completedList[index].id!,
+                              title: completedList[index].todoTitle!,
+                              date: completedList[index].todoDeadline!,
+                              status: completedList[index].status!,
+                            );
+                          }),
                     ),
                   ),
           ],

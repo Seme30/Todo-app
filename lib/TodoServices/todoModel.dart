@@ -6,22 +6,22 @@ class TodoFields {
     id, todoTitle, todoDeadline, todoCreatedDate, status
   ];
 
-  static final String id = '_id';
-  static final String todoTitle = 'todoTitle';
-  static final String todoDeadline = 'todoDeadline';
-  static final String todoCreatedDate = 'todoCreatedDate';
-  static final String status = 'status';
+  static const String id = 'id';
+  static const String todoTitle = 'todoTitle';
+  static const String todoDeadline = 'todoDeadline';
+  static const String todoCreatedDate = 'todoCreatedDate';
+  static const String status = 'status';
 }
 
 class TodoModel {
   int? id;
   String? todoTitle;
-  String? todoDeadline;
-  String? todoCreatedDate;
+  DateTime? todoDeadline;
+  DateTime? todoCreatedDate;
   String? status;
 
   TodoModel(
-      {this.id,
+      {required this.id,
       required this.todoTitle,
       required this.todoDeadline,
       required this.todoCreatedDate,
@@ -30,8 +30,8 @@ class TodoModel {
   TodoModel copy(
           {int? id,
           String? todoTitle,
-          String? todoDeadline,
-          String? todoCreatedDate,
+          DateTime? todoDeadline,
+          DateTime? todoCreatedDate,
           String? status}) =>
       TodoModel(
         id: id ?? this.id,
@@ -41,18 +41,24 @@ class TodoModel {
         status: status ?? this.status,
       );
 
-  static TodoModel fromJson(Map<String, dynamic> json) => TodoModel(
-      id: json['id'],
-      todoTitle: json['todoTitle'],
-      todoCreatedDate: json['todoCreatedDate'],
-      todoDeadline: json['todoDeadline'],
-      status: json['status']);
+  // static TodoModel fromJson(Map<String, dynamic> json) {
+  //   String key = json['todoDeadline'];
+  //   String key2 = json['todoCreatedDate'];
+  //   DateTime dateTime = DateTime.parse(key);
+  //   DateTime dateTime2 = DateTime.parse(key2);
+  //   return TodoModel(
+  //       id: json['id'],
+  //       todoTitle: json['todoTitle'],
+  //       todoCreatedDate: dateTime2,
+  //       todoDeadline: dateTime,
+  //       status: json['status']);
+  // }
 
-  Map<String, dynamic> toJson(TodoModel todo) => {
-        TodoFields.id: todo.id,
-        TodoFields.todoTitle: todo.todoTitle,
-        TodoFields.todoCreatedDate: todo.todoCreatedDate,
-        TodoFields.todoDeadline: todo.todoDeadline,
-        TodoFields.status: todo.status
-      };
+  // Map<String, dynamic> toJson(TodoModel todo) => {
+  //       TodoFields.id: todo.id,
+  //       TodoFields.todoTitle: todo.todoTitle,
+  //       TodoFields.todoCreatedDate: todo.todoCreatedDate.toString(),
+  //       TodoFields.todoDeadline: todo.todoDeadline.toString(),
+  //       TodoFields.status: todo.status
+  //     };
 }

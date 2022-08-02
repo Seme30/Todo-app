@@ -12,6 +12,13 @@ class TodoProvider with ChangeNotifier {
     return _todos.firstWhere((element) => element.id == id);
   }
 
+  void readTodos() async {
+    _todos = await TodoDatabase.instance.readAllTodos();
+    isLoading = false;
+    verifytodos(_todos);
+    notifyListeners();
+  }
+
   void setTodo(TodoModel todo) {
     _todo = todo;
     _todos.add(todo);
@@ -23,5 +30,19 @@ class TodoProvider with ChangeNotifier {
     _todos = todos;
     isLoading = false;
     notifyListeners();
+  }
+
+  Future delete(int id) async {
+    await TodoDatabase.instance.delete(id);
+    notifyListeners();
+  }
+
+  void verifytodos(List<TodoModel> todos) async {
+    for (var element in todos) {
+      if (element.todoDeadline!.isBefore(DateTime.now())) {
+        element.status = 'Completed';
+        await TodoDatabase.instance.update(element);
+      }
+    }
   }
 }

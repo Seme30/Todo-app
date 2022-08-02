@@ -1,5 +1,6 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:todoapp/TodoServices/todoModel.dart';
+import 'package:todoapp/constants/app_constants.dart';
 import 'package:todoapp/utils/date_and_time_picker.dart';
 
 class NotificationService {
@@ -11,7 +12,7 @@ class NotificationService {
 
     await AwesomeNotifications().createNotification(
       content: NotificationContent(
-        id: todo.id!,
+        id: AppConstants.createUniqueId(),
         channelKey: 'scheduled_channel',
         title: 'You have a Task to do',
         body: 'you have to ${todo.todoTitle}',
@@ -35,7 +36,37 @@ class NotificationService {
     );
   }
 
-  Future<void> cancelScheduledNotifications() async {
-    await AwesomeNotifications().cancelAllSchedules();
+  Future<void> createTodo1hourReminderNotification(
+      DateTime dateTime, TodoModel todo) async {
+    DateTime h1our = dateTime.subtract(Duration(hours: 1));
+
+    await AwesomeNotifications().createNotification(
+      content: NotificationContent(
+        id: AppConstants.createUniqueId(),
+        channelKey: 'scheduled_channel',
+        title: 'You have a Task to do',
+        body: '1 hour remaining for ${todo.todoTitle}',
+        notificationLayout: NotificationLayout.Default,
+      ),
+      actionButtons: [
+        NotificationActionButton(
+          key: 'MARK_DONE',
+          label: 'Mark Done',
+          buttonType: ActionButtonType.Default,
+        ),
+      ],
+      schedule: NotificationCalendar(
+        weekday: dateTime.weekday,
+        hour: h1our.hour,
+        minute: dateTime.minute,
+        second: 0,
+        millisecond: 0,
+        repeats: true,
+      ),
+    );
+
+    Future<void> cancelScheduledNotifications() async {
+      await AwesomeNotifications().cancelAllSchedules();
+    }
   }
 }

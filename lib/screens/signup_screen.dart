@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:todoapp/TodoServices/AuthService.dart';
 import 'package:todoapp/constants/colors.dart';
 import 'package:todoapp/constants/dimensions.dart';
@@ -57,24 +56,18 @@ class _SignupScreenState extends State<SignupScreen> {
                   );
                 },
                 child: Container(
-                  height: Dimensions.height20 * 4,
-                  padding: EdgeInsets.symmetric(
-                      horizontal: Dimensions.width20,
-                      vertical: Dimensions.width20),
-                  decoration: BoxDecoration(
-                      color: AppColors.secColor,
-                      borderRadius: BorderRadius.circular(Dimensions.radius15)),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SvgPicture.asset('images/phone.svg'),
-                      BigText(
-                        text: 'Continue with phone',
-                        color: AppColors.textColor,
-                      )
-                    ],
-                  ),
-                ),
+                    height: Dimensions.height20 * 4,
+                    padding: EdgeInsets.symmetric(
+                        horizontal: Dimensions.width20,
+                        vertical: Dimensions.width20),
+                    decoration: BoxDecoration(
+                        color: AppColors.secColor,
+                        borderRadius:
+                            BorderRadius.circular(Dimensions.radius15)),
+                    child: BigText(
+                      text: 'Continue with phone',
+                      color: AppColors.textColor,
+                    )),
               ),
               SizedBox(
                 height: Dimensions.height30,

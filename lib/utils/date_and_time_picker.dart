@@ -9,10 +9,6 @@ class DateTimePicker {
   bool showTime = false;
   bool showDateTime = false;
 
-  int createUniqueId() {
-    return DateTime.now().millisecondsSinceEpoch.remainder(100000);
-  }
-
   // Select for Date
   Future<DateTime> selectDate(BuildContext context) async {
     final selected = await showDatePicker(
@@ -59,25 +55,20 @@ class DateTimePicker {
     if (selectedDate == null) {
       return 'select date';
     } else {
-      return DateFormat('MMM d, yyyy').format(selectedDate);
+      return DateFormat('yyyy-MM-dd').format(selectedDate);
     }
   }
 
-  DateTime getDateTime2() {
-    // ignore: unnecessary_null_comparison
-    if (dateTime == null) {
-      return DateTime.now().subtract(Duration(days: 2));
-    } else {
-      return dateTime;
-    }
-  }
+  // DateTime getDateTime2() {
+  //   // ignore: unnecessary_null_comparison
+  //   if (dateTime == null) {
+  //     return DateTime.now().subtract(Duration(days: 2));
+  //   } else {
+  //     return dateTime;
+  //   }
+  // }
 
-  String getDateTime() {
-    // ignore: unnecessary_null_comparison
-    if (dateTime == null) {
-      return 'select date timer';
-    } else {
-      return DateFormat('yyyy-MM-dd HH:mm:ss a').format(dateTime);
-    }
+  DateTime getDateTime() {
+    return dateTime;
   }
 }
