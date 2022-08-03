@@ -1,16 +1,11 @@
 # todoapp
 
-A new Flutter project.
+A Flutter project.
+users of the app can add their tasks with the scheduler
+The app will notify it's users when the it reaches the scheduled time
+also before 1 hour(will notify 1 hour remained for the user to accomplish the task) 
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Main dependencies
+- firebase authentication
+- sqflite database to store tasks locally
+- awesome_notification
