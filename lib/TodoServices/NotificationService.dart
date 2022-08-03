@@ -38,7 +38,7 @@ class NotificationService {
 
   Future<void> createTodo1hourReminderNotification(
       DateTime dateTime, TodoModel todo) async {
-    DateTime h1our = dateTime.subtract(Duration(hours: 1));
+    DateTime h1our = dateTime.subtract(const Duration(hours: 1));
 
     await AwesomeNotifications().createNotification(
       content: NotificationContent(

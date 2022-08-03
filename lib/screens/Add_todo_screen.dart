@@ -20,12 +20,17 @@ class _AddTodoScreenState extends State<AddTodoScreen> {
   String selectedDateTime = 'Schedule task';
   DateTime schedule = DateTime.now();
   DateTimePicker dateTimePicker = DateTimePicker();
-  int _newId = AppConstants.createUniqueId();
+  final int _newId = AppConstants.createUniqueId();
   NotificationService notificationService = NotificationService();
 
   void creatingTodos(todo, BuildContext con, DateTime schedule) async {
     print('creating todo');
     await TodoDatabase.instance.createTodo(todo, con);
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(
+        'Task Added',
+      ),
+    ));
     await notificationService.createTodoReminderNotification(schedule, todo);
     await notificationService.createTodo1hourReminderNotification(
         schedule, todo);
@@ -34,6 +39,7 @@ class _AddTodoScreenState extends State<AddTodoScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        resizeToAvoidBottomInset: false,
         appBar: AppBar(
           backgroundColor: AppColors.secColor,
           title: BigText(

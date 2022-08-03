@@ -68,11 +68,11 @@ class _AllScreenState extends State<AllScreen> {
     );
 
     AwesomeNotifications().createdStream.listen((notification) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text(
-          'Notification Created on ${notification.channelKey}',
-        ),
-      ));
+      // ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      //   content: Text(
+      //     'Notification Created on ${notification.channelKey}',
+      //   ),
+      // ));
     });
 
     AwesomeNotifications().actionStream.listen((notification) async {
@@ -95,10 +95,9 @@ class _AllScreenState extends State<AllScreen> {
 
   @override
   Widget build(BuildContext context) {
+    Provider.of<TodoProvider>(context, listen: false).readTodos();
     TodoProvider todoProvider =
         Provider.of<TodoProvider>(context, listen: true);
-
-    Provider.of<TodoProvider>(context, listen: false).readTodos();
 
     return Scaffold(
       appBar: AppBar(
@@ -129,7 +128,7 @@ class _AllScreenState extends State<AllScreen> {
         padding: EdgeInsets.only(
             left: Dimensions.width20,
             right: Dimensions.width20,
-            top: Dimensions.height20),
+            top: Dimensions.height10),
         height: Dimensions.screenHeight,
         width: Dimensions.screenWidth,
         decoration: BoxDecoration(color: AppColors.mainColor),

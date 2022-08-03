@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:todoapp/TodoServices/AuthService.dart';
 import 'package:todoapp/constants/colors.dart';
 import 'package:todoapp/constants/dimensions.dart';
+import 'package:todoapp/screens/main_screen.dart';
 import 'package:todoapp/screens/phoneauth_screen.dart';
 import 'package:todoapp/screens/signup_screen.dart';
 import 'package:todoapp/screens/tabs_screen.dart';

@@ -23,13 +23,16 @@ class _InCompletedScreenState extends State<InCompletedScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final todos = Provider.of<TodoProvider>(context);
-    List<TodoModel> incompletedList = [];
-    for (var element in todos.todos) {
+    Provider.of<TodoProvider>(context, listen: false).readTodos();
+    TodoProvider todoProvider =
+        Provider.of<TodoProvider>(context, listen: true);
+    List<TodoModel> todoList = [];
+    for (var element in todoProvider.todos) {
       if (element.status == 'Incomplete') {
-        incompletedList.add(element);
+        todoList.add(element);
       }
     }
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.secColor,
@@ -65,23 +68,23 @@ class _InCompletedScreenState extends State<InCompletedScreen> {
         decoration: BoxDecoration(color: AppColors.mainColor),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             SizedBox(height: Dimensions.height10),
-            incompletedList.isEmpty
+            todoList.isEmpty
                 ? Container(child: Center(child: BigText(text: 'No Todos')))
                 : Container(
                     height: Dimensions.height45 * 10,
-                    child: Expanded(
+                    child: SingleChildScrollView(
                       child: ListView.builder(
                           shrinkWrap: true,
-                          itemCount: incompletedList.length,
+                          itemCount: todoList.length,
                           itemBuilder: (context, index) {
                             return TodoList(
-                              id: incompletedList[index].id!,
-                              title: incompletedList[index].todoTitle!,
-                              date: incompletedList[index].todoDeadline!,
-                              status: incompletedList[index].status!,
+                              id: todoList[index].id!,
+                              title: todoList[index].todoTitle!,
+                              date: todoList[index].todoDeadline!,
+                              status: todoList[index].status!,
                             );
                           }),
                     ),
